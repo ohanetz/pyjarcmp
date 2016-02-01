@@ -18,6 +18,7 @@ def print_usage():
     print "Usage: pyjarcmp.py -o OLD_JAR_PATH -n NEW_JAR_PATH [OPTIONS]"
     print "Options:"
     print " -exclude_meta_inf   Don't compare content in /META-INF/ folder"
+    print " -exclude [FILES]    List of files to exclude from the comparison" 
 
 
 
@@ -79,8 +80,17 @@ def __main__():
             new_jar_files.append(os.path.join(subdir, f))
 
     if "-exclude_meta_inf" in sys.argv:
+        l.log("Excluding META-INF")
         old_jar_files = [x for x in old_jar_files if x.find("/META-INF/") < 0]
         new_jar_files = [x for x in new_jar_files if x.find("/META-INF/") < 0]
+
+    if "-exclude" in sys.argv:
+        excludes = sys.argv[sys.argv.index("-exclude") + 1].split(",")
+        for efile in excludes:
+            l.log("Excluding " + efile)
+            old_jar_files = [x for x in old_jar_files if x.find(efile.strip()) < 0]
+            new_jar_files = [x for x in new_jar_files if x.find(efile.strip()) < 0]
+            
 
     exit(jar_compare(old_jar_files, new_jar_files))
 
